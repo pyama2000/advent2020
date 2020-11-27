@@ -1,0 +1,11 @@
+FROM rust:1
+WORKDIR /usr/src/advent2020_api
+RUN cargo install cargo-watch && \
+    rustup component add clippy
+COPY Cargo.toml Cargo.toml
+RUN mkdir src && \
+    echo "fn main() {println!(\"if you see this, the build broke\")}" > src/main.rs
+RUN cargo clippy
+COPY . .
+
+CMD ["cargo", "watch", "-x", "clippy", "-x", "run"]
