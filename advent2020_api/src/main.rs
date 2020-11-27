@@ -23,7 +23,7 @@ async fn index(session: Session) -> Result<impl Responder, Error> {
         }
     };
 
-    return Ok(HttpResponse::Ok().json(&json));
+    Ok(HttpResponse::Ok().json(&json))
 }
 
 #[actix_web::main]
