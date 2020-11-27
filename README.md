@@ -12,6 +12,8 @@ Rust はコンパイルに時間がかかるので気長にお待ち下さい。
 
 ```bash
 docker-compose -f docker-compose.node.yml up --build
+cd advent2020_api
+cargo run
 ```
 
 ### Docker only
