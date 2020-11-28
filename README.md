@@ -26,6 +26,9 @@ docker-compose -f docker-compose.node.yml up --build
 
 ### Docker only
 
+ローカルに Rust 環境を作りたくない人は Docker のみでも開発可能です。
+`advent2020_api/src/main.rs` を編集すると自動的にファイルを読み込んで Docker 上で実行します（ホットリロード）。
+
 ```bash
 docker-compose -f docker-compose.dev.yml up --build
 ```
