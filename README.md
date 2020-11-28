@@ -1,6 +1,7 @@
 # advent2020
 
-**※ Docker と docker-compose を使用します！**  
+**※ Docker と docker-compose を使用します！**
+
 Rust 環境がなくても Docker のみで試せるようにしています。  
 Rust はコンパイルに時間がかかるので気長にお待ち下さい。
 
