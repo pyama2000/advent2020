@@ -3,7 +3,7 @@ use std::env;
 use actix_redis::RedisSession;
 use actix_session::Session;
 use actix_web::{
-    http::header::ACCESS_CONTROL_ALLOW_CREDENTIALS,
+    http::header::{ACCESS_CONTROL_ALLOW_CREDENTIALS, ACCESS_CONTROL_ALLOW_ORIGIN},
     middleware::{DefaultHeaders, Logger},
     web, App, Error, HttpResponse, HttpServer, Responder,
 };
@@ -12,8 +12,8 @@ use rand_chacha::ChaCha20Rng;
 use serde_json::json;
 use uuid::Uuid;
 
-async fn index(session: Session) -> Result<impl Responder, Error> {
-    let json = match session.get::<String>("user_id")? {
+async fn login(session: Session) -> Result<impl Responder, Error> {
+    let json = match session.get::<Uuid>("user_id")? {
         Some(user_id) => json!({"user_id": &user_id,}),
         None => {
             let user_id = Uuid::new_v4();
@@ -24,6 +24,38 @@ async fn index(session: Session) -> Result<impl Responder, Error> {
     };
 
     Ok(HttpResponse::Ok().json(&json))
+}
+
+async fn change(session: Session) -> Result<impl Responder, Error> {
+    if session.get::<Uuid>("user_id")?.is_none() {
+        return Ok(HttpResponse::Unauthorized().finish());
+    }
+
+    let user_id = Uuid::new_v4();
+    session.set("user_id", &user_id)?;
+
+    Ok(HttpResponse::Ok().json(json!({ "user_id": &user_id })))
+}
+
+async fn add(session: Session) -> Result<impl Responder, Error> {
+    if session.get::<Uuid>("user_id")?.is_none() {
+        return Ok(HttpResponse::Unauthorized().finish());
+    }
+
+    let count = session.get::<u32>("count")?.unwrap_or(0) + 1;
+    session.set("count", &count)?;
+
+    Ok(HttpResponse::Ok().json(json!({ "count": &count })))
+}
+
+async fn reset(session: Session) -> Result<impl Responder, Error> {
+    if session.get::<Uuid>("user_id")?.is_none() {
+        return Ok(HttpResponse::Unauthorized().finish());
+    }
+
+    session.set("count", 0)?;
+
+    Ok(HttpResponse::Ok().json(json!({ "count": 0 })))
 }
 
 #[actix_web::main]
@@ -43,9 +75,12 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(Logger::default())
             .wrap(RedisSession::new(&redis_url, &data))
-            .wrap(actix_cors::Cors::default())
+            .wrap(DefaultHeaders::new().header(ACCESS_CONTROL_ALLOW_ORIGIN, "*"))
             .wrap(DefaultHeaders::new().header(ACCESS_CONTROL_ALLOW_CREDENTIALS, "true"))
-            .route("/", web::get().to(index))
+            .route("/login", web::post().to(login))
+            .route("/change", web::patch().to(change))
+            .route("/add", web::post().to(add))
+            .route("/reset", web::delete().to(reset))
     })
     .bind(format!("{}:{}", host, port))?
     .run()
