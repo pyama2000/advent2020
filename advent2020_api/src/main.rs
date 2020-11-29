@@ -63,8 +63,8 @@ async fn main() -> std::io::Result<()> {
     env::set_var("RUST_LOG", "actix_web=debug,actix_redis=info");
     env_logger::init();
 
-    let host = env::var("host").unwrap_or_else(|_| "0.0.0.0".to_string());
-    let port = env::var("port").unwrap_or_else(|_| "8000".to_string());
+    let host = env::var("HOST").unwrap_or_else(|_| "0.0.0.0".to_string());
+    let port = env::var("PORT").unwrap_or_else(|_| "8000".to_string());
     let redis_url = env::var("REDIS_URL").unwrap_or_else(|_| "0.0.0.0:6379".to_string());
 
     let mut csp_rng = ChaCha20Rng::from_entropy();
