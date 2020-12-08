@@ -1,63 +1,129 @@
 <template>
-  <div class="container">
-    <div>
-      <Logo />
-      <h1 class="title">advent2020_frontend</h1>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--green"
+  <section class="index">
+    <div class="index__card">
+      <div class="index__card__body">
+        <span class="index__card__body__text">USER ID: {{ userId }}</span>
+        <span class="index__card__body__text">COUNT: {{ count }}</span>
+      </div>
+      <div class="index__card__button-container">
+        <Button
+          class="index__card__button-container__button__login"
+          @click.native="login"
         >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
+          login
+        </Button>
+        <Button
+          class="index__card__button-container__button__change"
+          @click.native="change"
         >
-          GitHub
-        </a>
+          change
+        </Button>
+        <Button
+          class="index__card__button-container__button__add"
+          @click.native="add"
+        >
+          add
+        </Button>
+        <Button
+          class="index__card__button-container__button__reset"
+          @click.native="reset"
+        >
+          reset
+        </Button>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script>
-export default {}
+export default {
+  components: {
+    Button: () => import('@/components/base/Button.vue'),
+  },
+  data() {
+    return {
+      userId: '',
+      count: 0,
+    }
+  },
+  methods: {
+    login() {
+      this.$axios.post('/login').then(({ data }) => {
+        this.userId = data.user_id
+      })
+    },
+    change() {
+      this.$axios.patch('/change').then(({ data }) => {
+        this.userId = data.user_id
+      })
+    },
+    add() {
+      this.$axios.post('/add').then(({ data }) => {
+        this.count = data.count
+      })
+    },
+    reset() {
+      this.$axios.delete('/reset').then(({ data }) => {
+        this.count = data.count
+      })
+    },
+  },
+}
 </script>
 
-<style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
+<style lang="scss" scoped>
+.index {
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  text-align: center;
-}
 
-.title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
+  &__card {
+    width: 340px;
+    padding: 12px 24px;
+    background-color: #fffffe;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px #ccc;
+    display: flex;
+    flex-direction: column;
 
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
+    &__body {
+      margin: 32px 0;
+      display: flex;
+      flex-direction: column;
 
-.links {
-  padding-top: 15px;
+      &__text {
+        color: #272343;
+        font-size: large;
+      }
+    }
+
+    &__button-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      grid-template-areas:
+        'login .'
+        'change .'
+        'add reset';
+      gap: 8px;
+
+      &__button__login {
+        grid-area: login;
+      }
+
+      &__button__change {
+        grid-area: change;
+      }
+
+      &__button__add {
+        grid-area: add;
+      }
+
+      &__button__reset {
+        grid-area: reset;
+      }
+    }
+  }
 }
 </style>
